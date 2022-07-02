@@ -1,31 +1,48 @@
 import random
 
+# Samples a random vector with coefficients in [a, b]^n
+def sample_vector(n, a, b):
+    return [random.randint(a,b) for _ in range(n)]
+
+# Samples a random matrix in (Z/qZ)^{n x n}
+def sample_matrix(n, q):
+    # q-1 so we don't double count 0 = q mod q
+    return [sample_vector(n, 0, q-1) for _ in range(n)]
+
+def LWE_func(A, s, e, q):
+    n = len(A)
+    b = [0 for _ in range(self.n)]
+    for i in range(self.n):
+        for k in range(self.n):
+            b[i] += A[i][k] * self.s[k] % self.q
+        b[i] += e[i] % self.q
+    return b
+
+
 class LWEPrivKey:
     def __init__(self, n, q, B):
         self.n = n
         self.q = q
         self.B = B
     def key_gen(self):
-        self.s = [0 for _ in range(self.n)]
-        for i in range(self.n):
-            self.s[i] = random.randint(0, self.q)
+        self.s = sample_vector(self.n, 0, self.q-1)
 
-    def enc(self, m):
-        # Sampling the various values
-        A = [[0 for _ in range(self.n)] for _ in range(self.n)]
-        for i in range(self.n):
-            for j in range(self.n):
-                A[i][j] = random.randint(0, self.q)
-        e = [0 for _ in range(self.n)]
-        for i in range(self.n):
-            e[i] = random.randint(-self.B, self.B)
-        # Computing b := As + e
+    # Works for arbitrary s, rather than self.s, to make
+    # public-key encryption easier to define later
+    def LWE_func(self, A, s, e):
         b = [0 for _ in range(self.n)]
         for i in range(self.n):
             for k in range(self.n):
-                b[i] += A[i][k] * self.s[k] % self.q
+                b[i] += A[i][k] * s[k] % self.q
             b[i] += e[i] % self.q
-        # (A, b) is indistinguishable from random under the LWE assumption.
+        return b
+
+    def enc(self, m):
+        # Sampling the various values
+        A = sample_matrix(n, self.q)
+        e = sample_vector(self.n, -self.B, self.B)
+        # Computing b := As + e
+        b = self.LWE_func(A, self.s, e)
         for i in range(self.n):
             b[i] += m[i] * (q//2) % self.q
         return (A, b)
