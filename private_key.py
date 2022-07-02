@@ -1,6 +1,31 @@
 import random
 from utils import *
 
+class NoiselessPrivKey:
+    def __init__(self, n, q):
+        self.n = n
+        self.q = q
+    def key_gen(self):
+        self.s = sample_unif_vector(self.n, self.q)
+
+    def enc(self, m):
+        # Sampling A
+        A = sample_unif_matrix(n, self.q)
+        # Computing b := As
+        b = matrix_vector_multiply(A, self.s, self.q)
+        # Adding m to As
+        b = vector_vector_add(b, m, self.q)
+        return (A, b)
+
+    def dec(self, ctxt):
+        (A, b) = ctxt[0], ctxt[1]
+        # Recomputing As
+        As = matrix_vector_multiply(A, self.s, self.q)
+        # Recovering m = b - As
+        for i in range(self.n):
+            b[i] = (b[i] - As[i]) % q
+        return b
+
 class LWEPrivKey:
     def __init__(self, n, q, B):
         self.n = n
@@ -38,7 +63,7 @@ if __name__ == "__main__":
     q = 3000
     n = 1000
     B = 10
-    E = LWEPrivKey(n,q,B)
+    E = NoiselessPrivKey(n,q)
     t= time.time()
     E.key_gen()
     t_keys = time.time()
