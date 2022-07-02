@@ -1,23 +1,13 @@
 import random
 
-# Samples a random vector with coefficients in [a, b]^n
+# Samples a random vector with coefficients in [a, b)^n
+# Notabely, sample_vector(n, 0,q) samples a random vector from (Z/qZ)^n
 def sample_vector(n, a, b):
-    return [random.randint(a,b) for _ in range(n)]
+    return [random.randint(a,b-1) for _ in range(n)]
 
 # Samples a random matrix in (Z/qZ)^{n x n}
 def sample_matrix(n, q):
-    # q-1 so we don't double count 0 = q mod q
-    return [sample_vector(n, 0, q-1) for _ in range(n)]
-
-def LWE_func(A, s, e, q):
-    n = len(A)
-    b = [0 for _ in range(self.n)]
-    for i in range(self.n):
-        for k in range(self.n):
-            b[i] += A[i][k] * self.s[k] % self.q
-        b[i] += e[i] % self.q
-    return b
-
+    return [sample_vector(n, 0, q) for _ in range(n)]
 
 class LWEPrivKey:
     def __init__(self, n, q, B):
@@ -43,6 +33,7 @@ class LWEPrivKey:
         e = sample_vector(self.n, -self.B, self.B)
         # Computing b := As + e
         b = self.LWE_func(A, self.s, e)
+        # Adding a scaled copy of m to b
         for i in range(self.n):
             b[i] += m[i] * (q//2) % self.q
         return (A, b)
