@@ -22,6 +22,10 @@ def vector_vector_add(m, v, q):
     n = len(m)
     return [m[i]+v[i] %q for i in range(n)] 
 
+def vector_vector_inner_product(m, v, q):
+    n = len(m)
+    return sum(m[i]*v[i] for i in range(n)) % q
+
 def matrix_matrix_multiply(m, v, q):
     n = len(m)
     return [[sum(m[i][k] * v[k][j] for k in range(n)) % q for j in range(n)] for i in range(n)]
@@ -32,4 +36,4 @@ def matrix_matrix_add(m, v, q):
 
 def matrix_transpose(m):
     n = len(m)
-    return [[m[i][j] for j in range(n)] for i in range(n)]
+    return [[m[j][i] for j in range(n)] for i in range(n)]
