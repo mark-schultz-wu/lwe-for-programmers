@@ -18,10 +18,18 @@ def matrix_vector_multiply(m, v):
     n = len(m)
     return [sum(m[i][j] * v[j] for j in range(n)) for i in range(n)]
 
+def vector_vector_add(m, v):
+    n = len(m)
+    return [m[i]+v[i] for i in range(n)] 
+
 def matrix_matrix_multiply(m, v):
     n = len(m)
-    return [[sum(m[i][j] * v[j][k] for j in range(n)) for i in range(n)] for k in range(n)]
+    return [[sum(m[i][k] * v[k][j] for k in range(n)) for j in range(n)] for i in range(n)]
+
+def matrix_matrix_add(m, v):
+    n = len(m)
+    return [[m[i][j] + v[i][j] for j in range(n)] for i in range(n)]
 
 def matrix_transpose(m):
     n = len(m)
-    return [[m[i][j] for i in range(n)] for j in range(n)]
+    return [[m[i][j] for j in range(n)] for i in range(n)]

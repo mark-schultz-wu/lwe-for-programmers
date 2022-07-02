@@ -1,13 +1,5 @@
 import random
-
-# Samples a random vector with coefficients in [a, b)^n
-# Notabely, sample_vector(n, 0,q) samples a random vector from (Z/qZ)^n
-def sample_vector(n, a, b):
-    return [random.randint(a,b-1) for _ in range(n)]
-
-# Samples a random matrix in (Z/qZ)^{n x n}
-def sample_matrix(n, q):
-    return [sample_vector(n, 0, q) for _ in range(n)]
+from utils import *
 
 class LWEPrivKey:
     def __init__(self, n, q, B):
@@ -15,23 +7,14 @@ class LWEPrivKey:
         self.q = q
         self.B = B
     def key_gen(self):
-        self.s = sample_vector(self.n, 0, self.q)
-
-    # Works for arbitrary s, rather than self.s, to make
-    # public-key encryption easier to define later
-    def LWE_func(self, A, s, e):
-        b = [0 for _ in range(self.n)]
-        for i in range(self.n):
-            for k in range(self.n):
-                b[i] += A[i][k] * s[k] % self.q
-            b[i] += e[i] % self.q
-        return b
+        self.s = sample_unif_vector(self.n, self.q)
 
     def enc(self, m):
         # Sampling the various values
-        A = sample_matrix(n, self.q)
-        e = sample_vector(self.n, -self.B, self.B)
-        # Computing b := As + e
+        A = sample_unif_matrix(n, self.q)
+        e = sample_bounded_vector(self.n, self.B)
+        # Computing b := As
+        b = matrix_vector_multiply(A, self.s)
         b = self.LWE_func(A, self.s, e)
         # Adding a scaled copy of m to b
         for i in range(self.n):
