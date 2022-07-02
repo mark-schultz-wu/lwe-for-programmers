@@ -15,7 +15,7 @@ class LWEPrivKey:
         self.q = q
         self.B = B
     def key_gen(self):
-        self.s = sample_vector(self.n, 0, self.q-1)
+        self.s = sample_vector(self.n, 0, self.q)
 
     # Works for arbitrary s, rather than self.s, to make
     # public-key encryption easier to define later
